@@ -69,13 +69,23 @@
   /* ── TYPOGRAPHY FLUID ── */
   .hero-title { 
     font-family: 'Cormorant Garamond', serif; 
-    font-size: clamp(2.5rem, 6vw, 5rem); /* Made it much larger/bolder */
-    font-weight: 700; /* Bold weight */
-    letter-spacing: .02em; 
-    line-height: 1.1;
-    color: #fff;
-    /* This creates the black boundary (stroke) */
+    font-size: clamp(2.8rem, 7vw, 5.5rem); /* Bolder size for that 50k look */
+    font-weight: 800; /* Extra bold */
+    line-height: 1;
+    color: #fff; /* The "Skin Hub" part stays white */
+    
+    /* BLACK BOUNDARY FOR WHITE TEXT */
     -webkit-text-stroke: 1.5px #000; 
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2); /* Subtle depth */
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  /* GOLD 'PRIME' STYLING */
+  .hero-title span.gold-text {
+    color: var(--gold);
+    /* BLACK BOUNDARY FOR GOLD TEXT */
+    -webkit-text-stroke: 1.5px #000;
   }
 
   /* Specific Gold 'Prime' styling */
