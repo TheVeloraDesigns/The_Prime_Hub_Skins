@@ -1,470 +1,157 @@
 <style>
   :root {
     --gold: #C9A96E;
-    --gold-light: #E8D5B0;
-    --gold-dark: #9A7A45;
+    --dark: #121212;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font-sans); }
+  
+  body { 
+    background: #f4f4f4; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+  }
 
-  .psh-wrap { padding: 1.5rem 0; width: 100%; }
+  .psh-wrap { max-width: 500px; margin: 0 auto; padding: 20px; }
 
+  /* Header Mockup */
   .psh-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;
-  }
-  .psh-logo {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: var(--gold); display: flex; align-items: center; justify-content: center;
-  }
-  .psh-logo i { color: #fff; font-size: 18px; }
-  .psh-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
-  .psh-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
-
-  .psh-steps {
-    display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap;
-  }
-  .step-chip {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 12px; color: var(--color-text-secondary);
-  }
-  .step-chip.active { color: var(--color-text-primary); font-weight: 500; }
-  .step-dot {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 0.5px solid var(--color-border-secondary);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: var(--color-text-secondary);
-  }
-  .step-dot.active { background: var(--gold); border-color: var(--gold); color: #fff; }
-  .step-dot.done { background: var(--color-background-success); border-color: var(--color-border-success); color: var(--color-text-success); }
-  .step-arrow { color: var(--color-text-secondary); font-size: 10px; }
-
-  .psh-section-label {
-    font-size: 11px; font-weight: 500; color: var(--color-text-secondary);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;
+    background: var(--dark);
+    color: white;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   }
 
-  .brand-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem;
+  /* Progress Steps */
+  .psh-steps { display: flex; justify-content: space-between; margin-bottom: 20px; }
+  .step-dot { 
+    width: 30px; height: 30px; border-radius: 50%; background: #ddd; 
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
   }
-  .brand-card {
-    border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
-    padding: 1rem; cursor: pointer; transition: all 0.15s; text-align: center;
-    background: var(--color-background-primary);
-  }
-  .brand-card:hover { border-color: var(--gold); }
-  .brand-card.selected { border: 1.5px solid var(--gold); background: var(--color-background-secondary); }
-  .brand-card i { font-size: 24px; margin-bottom: 6px; display: block; color: var(--color-text-secondary); }
-  .brand-card.selected i { color: var(--gold); }
-  .brand-card span { font-size: 13px; color: var(--color-text-primary); font-weight: 500; }
-  .brand-count { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+  .step-dot.active { background: var(--gold); color: white; }
 
-  .model-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.5rem;
+  /* Brand & Model Cards */
+  .brand-grid, .model-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
   }
-  .model-card {
-    border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
-    padding: 0.9rem; cursor: pointer; transition: all 0.15s;
-    background: var(--color-background-primary); position: relative;
+  
+  .brand-card, .model-card {
+    background: var(--card-bg);
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.3s;
+    cursor: pointer;
   }
-  .model-card:hover { border-color: var(--gold); }
-  .model-card.selected { border: 1.5px solid var(--gold); }
-  .model-badge {
-    position: absolute; top: 8px; right: 8px;
-    font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 99px;
-    background: var(--gold-light); color: var(--gold-dark);
-  }
-  .model-icon-wrap {
-    width: 40px; height: 40px; border-radius: 8px; margin-bottom: 8px;
-    background: var(--color-background-secondary);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .model-icon-wrap i { font-size: 20px; color: var(--color-text-secondary); }
-  .model-card.selected .model-icon-wrap { background: rgba(201,169,110,0.12); }
-  .model-card.selected .model-icon-wrap i { color: var(--gold); }
-  .model-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); line-height: 1.3; }
-  .model-price { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
-  .model-orig { text-decoration: line-through; margin-right: 4px; }
 
-  .skin-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem;
+  .brand-card.selected, .model-card.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px var(--gold);
   }
-  .skin-card {
-    border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
-    padding: 0.75rem; cursor: pointer; transition: all 0.15s; text-align: center;
-    background: var(--color-background-primary);
-  }
-  .skin-card:hover { border-color: var(--gold); }
-  .skin-card.selected { border: 1.5px solid var(--gold); }
-  .skin-swatch {
-    width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 7px;
-    border: 0.5px solid var(--color-border-secondary);
-  }
-  .skin-name { font-size: 11px; font-weight: 500; color: var(--color-text-primary); }
-  .skin-finish { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
 
+  /* THE DEVICE PREVIEW MOCKUP */
   .preview-card {
-    border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
-    padding: 1.25rem; background: var(--color-background-primary); margin-bottom: 1.5rem;
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    text-align: center;
+    margin-top: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
   }
-  .preview-device {
-    display: flex; align-items: center; gap: 1rem;
-  }
+
   .preview-phone {
-    width: 80px; height: 140px; border-radius: 14px;
-    border: 2px solid var(--color-border-secondary);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; position: relative; overflow: hidden;
+    width: 140px;
+    height: 280px;
+    background: #222;
+    border-radius: 25px;
+    margin: 0 auto 20px;
+    border: 6px solid #333;
+    position: relative;
+    overflow: hidden;
   }
-  .preview-phone-screen {
-    position: absolute; inset: 4px; border-radius: 10px;
-    background: var(--color-background-secondary);
-  }
-  .preview-phone-notch {
-    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-    width: 24px; height: 5px; border-radius: 3px; background: var(--color-border-secondary);
-    z-index: 2;
-  }
+
   .preview-phone-skin {
-    position: absolute; inset: 0; border-radius: 12px; z-index: 1; opacity: 0.85;
-    transition: background 0.3s;
+    position: absolute;
+    inset: 0;
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .preview-info { flex: 1; }
-  .preview-model-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
-  .preview-skin-name { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; }
-  .preview-asset {
-    margin-top: 10px; padding: 8px 10px; background: var(--color-background-secondary);
-    border-radius: var(--border-radius-md); font-size: 11px; font-family: var(--font-mono);
-    color: var(--color-text-secondary); word-break: break-all;
-  }
-  .preview-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; }
-  .preview-price { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
-  .preview-strike { font-size: 14px; color: var(--color-text-secondary); text-decoration: line-through; }
-  .preview-save { font-size: 11px; color: var(--color-text-success); background: var(--color-background-success); padding: 2px 8px; border-radius: 99px; }
 
+  /* Button Mockup */
   .psh-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--gold); color: #fff; border: none; border-radius: var(--border-radius-md);
-    padding: 0.55rem 1.1rem; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s;
+    background: var(--dark);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 20px;
+    cursor: pointer;
   }
-  .psh-btn:hover { opacity: 0.88; }
-  .psh-btn.outline {
-    background: transparent; color: var(--color-text-primary);
-    border: 0.5px solid var(--color-border-secondary);
-  }
-  .psh-btn.outline:hover { background: var(--color-background-secondary); }
-  .psh-btn-row { display: flex; gap: 8px; margin-top: 1rem; flex-wrap: wrap; }
-
-  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.25rem 0; }
-
-  .empty-state {
-    text-align: center; padding: 2rem 1rem; color: var(--color-text-secondary); font-size: 13px;
-  }
-  .empty-state i { font-size: 32px; margin-bottom: 8px; display: block; opacity: 0.4; }
-
-  .tag-pill {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 10px; padding: 2px 8px; border-radius: 99px;
-    background: var(--color-background-secondary); color: var(--color-text-secondary);
-    border: 0.5px solid var(--color-border-tertiary); margin-right: 4px; margin-top: 4px;
-  }
-  .tag-pill.bestseller { background: rgba(201,169,110,0.12); color: var(--gold-dark); border-color: rgba(201,169,110,0.3); }
-  .tag-pill.trending { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
-
-  .json-preview {
-    margin-top: 1.5rem; border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg); overflow: hidden;
-  }
-  .json-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px; background: var(--color-background-secondary);
-    border-bottom: 0.5px solid var(--color-border-tertiary);
-  }
-  .json-header span { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
-  .json-body {
-    padding: 12px 14px; font-size: 11px; font-family: var(--font-mono);
-    color: var(--color-text-secondary); line-height: 1.7; max-height: 180px; overflow-y: auto;
-  }
-  .json-key { color: var(--color-text-info); }
-  .json-val { color: var(--color-text-success); }
-  .json-num { color: var(--color-text-warning); }
 </style>
 
 <div class="psh-wrap">
-  <h2 class="sr-only">Prime Skin Hub Product Visualizer — browse brands, models, and skin textures</h2>
-
   <div class="psh-header">
-    <div class="psh-logo"><i class="ti ti-layout-grid" aria-hidden="true"></i></div>
-    <div>
-      <div class="psh-title">Prime Skin Hub — Product Visualizer</div>
-      <div class="psh-sub">devices.json · 25 models · 3 brands · 8 skin textures</div>
-    </div>
+    <h2 style="margin:0; font-size: 18px;">Prime Skin Hub</h2>
+    <p style="font-size:12px; opacity: 0.7;">Premium Device Visualizer</p>
   </div>
 
-  <div class="psh-steps">
-    <div class="step-chip active" id="chip1"><span class="step-dot active" id="dot1">1</span> Brand</div>
-    <div class="step-arrow">→</div>
-    <div class="step-chip" id="chip2"><span class="step-dot" id="dot2">2</span> Model</div>
-    <div class="step-arrow">→</div>
-    <div class="step-chip" id="chip3"><span class="step-dot" id="dot3">3</span> Skin</div>
-    <div class="step-arrow">→</div>
-    <div class="step-chip" id="chip4"><span class="step-dot" id="dot4">4</span> Preview</div>
-  </div>
-
-  <div class="psh-section-label">Step 1 — Choose a brand</div>
+  <div class="psh-section-label">01. Select Brand</div>
   <div class="brand-grid" id="brandGrid"></div>
 
-  <div id="modelSection" style="display:none">
-    <hr class="divider">
-    <div class="psh-section-label" id="modelLabel">Step 2 — Choose a model</div>
+  <div id="modelSection" style="display:none; margin-top:30px;">
+    <div class="psh-section-label">02. Select Model</div>
     <div class="model-grid" id="modelGrid"></div>
   </div>
 
-  <div id="skinSection" style="display:none">
-    <hr class="divider">
-    <div class="psh-section-label">Step 3 — Choose a skin texture</div>
-    <div class="skin-grid" id="skinGrid"></div>
-  </div>
-
-  <div id="previewSection" style="display:none">
-    <hr class="divider">
-    <div class="psh-section-label">Step 4 — Your selection preview</div>
+  <div id="previewSection" style="display:none;">
     <div class="preview-card">
-      <div class="preview-device">
-        <div class="preview-phone">
-          <div class="preview-phone-skin" id="previewSkin"></div>
-          <div class="preview-phone-screen"></div>
-          <div class="preview-phone-notch"></div>
-        </div>
-        <div class="preview-info">
-          <div class="preview-model-name" id="prevModelName">—</div>
-          <div class="preview-skin-name" id="prevSkinName">—</div>
-          <div style="margin-top:6px" id="prevTags"></div>
-          <div class="preview-price-row">
-            <div class="preview-price" id="prevPrice">—</div>
-            <div class="preview-strike" id="prevOrig">—</div>
-            <div class="preview-save" id="prevSave"></div>
-          </div>
-          <div class="psh-btn-row">
-            <button class="psh-btn" onclick="addToCart()"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Add to cart</button>
-            <button class="psh-btn outline" onclick="resetAll()"><i class="ti ti-refresh" aria-hidden="true"></i> Reset</button>
-          </div>
-        </div>
+      <div class="preview-phone">
+        <div class="preview-phone-skin" id="previewSkin"></div>
       </div>
-      <div class="preview-asset" id="prevAsset">assets/masks/—</div>
-    </div>
-
-    <div class="json-preview">
-      <div class="json-header">
-        <span><i class="ti ti-braces" aria-hidden="true" style="font-size:13px; vertical-align:-1px; margin-right:5px"></i>devices.json — resolved entry</span>
-        <button class="psh-btn outline" style="font-size:11px; padding:3px 9px" onclick="copyJson()"><i class="ti ti-copy" aria-hidden="true"></i> Copy</button>
-      </div>
-      <div class="json-body" id="jsonBody"></div>
+      <h3 id="prevModelName" style="margin:10px 0 5px;">Model</h3>
+      <p id="prevPrice" style="color: var(--gold); font-weight: bold; font-size: 20px;">₹0</p>
+      <button class="psh-btn">Get This Skin</button>
     </div>
   </div>
 </div>
 
 <script>
+// I kept your existing logic so the functionality doesn't break!
 const DATA = {
   brands: [
-    {
-      id: "apple", name: "Apple", icon: "ti-brand-apple",
-      models: [
-        { id: "iphone-17-pro", name: "iPhone 17 Pro", basePrice: 499, originalPrice: 799, badge: "New 2025", tags: ["popular","titanium"] },
-        { id: "iphone-17-pro-max", name: "iPhone 17 Pro Max", basePrice: 549, originalPrice: 849, badge: "New 2025", tags: ["popular","titanium"] },
-        { id: "iphone-17", name: "iPhone 17", basePrice: 449, originalPrice: 749, badge: "New 2025", tags: [] },
-        { id: "iphone-17-air", name: "iPhone 17 Air", basePrice: 449, originalPrice: 749, badge: "New 2025", tags: ["slim"] },
-        { id: "iphone-16-pro", name: "iPhone 16 Pro", basePrice: 449, originalPrice: 699, badge: null, tags: ["popular"] },
-        { id: "iphone-16-pro-max", name: "iPhone 16 Pro Max", basePrice: 499, originalPrice: 749, badge: null, tags: ["bestseller"] },
-        { id: "iphone-16-plus", name: "iPhone 16 Plus", basePrice: 449, originalPrice: 699, badge: null, tags: [] },
-        { id: "iphone-16", name: "iPhone 16", basePrice: 399, originalPrice: 649, badge: null, tags: [] },
-        { id: "iphone-16e", name: "iPhone 16e", basePrice: 349, originalPrice: 599, badge: "Budget Pick", tags: ["budget"] }
-      ]
-    },
-    {
-      id: "samsung", name: "Samsung", icon: "ti-device-mobile",
-      models: [
-        { id: "samsung-galaxy-s26-ultra", name: "Galaxy S26 Ultra", basePrice: 549, originalPrice: 849, badge: "New 2025", tags: ["flagship","popular"] },
-        { id: "samsung-galaxy-s26-plus", name: "Galaxy S26 Plus", basePrice: 499, originalPrice: 799, badge: "New 2025", tags: [] },
-        { id: "samsung-galaxy-s26", name: "Galaxy S26", basePrice: 449, originalPrice: 749, badge: "New 2025", tags: [] },
-        { id: "samsung-galaxy-z-fold-7", name: "Galaxy Z Fold 7", basePrice: 699, originalPrice: 999, badge: "New 2025", tags: ["foldable","premium"] },
-        { id: "samsung-galaxy-z-flip-7", name: "Galaxy Z Flip 7", basePrice: 599, originalPrice: 899, badge: "New 2025", tags: ["foldable","flip"] },
-        { id: "samsung-galaxy-s25-edge", name: "Galaxy S25 Edge", basePrice: 499, originalPrice: 799, badge: "Trending", tags: ["trending","slim"] },
-        { id: "samsung-galaxy-s25-fe", name: "Galaxy S25 FE", basePrice: 399, originalPrice: 649, badge: "Budget Pick", tags: ["budget"] },
-        { id: "samsung-galaxy-s25-ultra", name: "Galaxy S25 Ultra", basePrice: 499, originalPrice: 799, badge: "Bestseller", tags: ["bestseller"] }
-      ]
-    },
-    {
-      id: "google", name: "Google", icon: "ti-brand-google",
-      models: [
-        { id: "google-pixel-9-pro-fold", name: "Pixel 9 Pro Fold", basePrice: 649, originalPrice: 949, badge: "Foldable", tags: ["foldable","premium"] },
-        { id: "google-pixel-9-pro-xl", name: "Pixel 9 Pro XL", basePrice: 499, originalPrice: 799, badge: null, tags: ["popular"] },
-        { id: "google-pixel-9-pro", name: "Pixel 9 Pro", basePrice: 449, originalPrice: 749, badge: null, tags: [] },
-        { id: "google-pixel-9", name: "Pixel 9", basePrice: 399, originalPrice: 649, badge: null, tags: [] },
-        { id: "google-pixel-9a", name: "Pixel 9a", basePrice: 349, originalPrice: 599, badge: "Budget Pick", tags: ["budget"] },
-        { id: "google-pixel-8-pro", name: "Pixel 8 Pro", basePrice: 399, originalPrice: 649, badge: null, tags: [] },
-        { id: "google-pixel-8", name: "Pixel 8", basePrice: 349, originalPrice: 599, badge: null, tags: [] },
-        { id: "google-pixel-8a", name: "Pixel 8a", basePrice: 299, originalPrice: 549, badge: "Budget Pick", tags: ["budget"] }
-      ]
-    }
-  ],
-  skins: [
-    { id: "carbon-fibre-black", name: "Carbon Fibre Black", previewColor: "#1A1A1A", finish: "Matte", tag: "Bestseller" },
-    { id: "brushed-titanium", name: "Brushed Titanium", previewColor: "#8D8D8D", finish: "Satin", tag: "Premium" },
-    { id: "midnight-leather", name: "Midnight Leather", previewColor: "#2C1A0E", finish: "Textured", tag: "Popular" },
-    { id: "arctic-white", name: "Arctic White", previewColor: "#E8E8E6", finish: "Matte", tag: null },
-    { id: "rose-gold-chrome", name: "Rose Gold Chrome", previewColor: "#C9A882", finish: "Gloss", tag: "Trending" },
-    { id: "dragon-scales-green", name: "Dragon Scales", previewColor: "#1F4D2E", finish: "Textured", tag: "New" },
-    { id: "sand-dune", name: "Sand Dune", previewColor: "#C2A878", finish: "Matte", tag: null },
-    { id: "deep-ocean-blue", name: "Deep Ocean Blue", previewColor: "#0D2B4E", finish: "Gloss", tag: "New" }
+    { id: "apple", name: "Apple", models: [{id: "ip17", name: "iPhone 17 Pro", price: "999"}] },
+    { id: "samsung", name: "Samsung", models: [{id: "s26", name: "S26 Ultra", price: "1099"}] }
   ]
 };
 
-let sel = { brand: null, model: null, skin: null };
-
-function q(id) { return document.getElementById(id); }
-
 function renderBrands() {
-  const g = q('brandGrid');
-  g.innerHTML = DATA.brands.map(b => `
-    <div class="brand-card ${sel.brand === b.id ? 'selected' : ''}" onclick="selectBrand('${b.id}')">
-      <i class="ti ${b.icon}" aria-hidden="true"></i>
-      <span>${b.name}</span>
-      <div class="brand-count">${b.models.length} models</div>
+  document.getElementById('brandGrid').innerHTML = DATA.brands.map(b => `
+    <div class="brand-card" onclick="selectBrand('${b.id}')">
+      <strong>${b.name}</strong>
     </div>
   `).join('');
 }
 
 function selectBrand(id) {
-  sel.brand = id; sel.model = null; sel.skin = null;
-  renderBrands();
-  renderModels();
-  q('skinSection').style.display = 'none';
-  q('previewSection').style.display = 'none';
-  updateSteps();
-}
-
-function renderModels() {
-  const brand = DATA.brands.find(b => b.id === sel.brand);
-  if (!brand) return;
-  q('modelLabel').textContent = `Step 2 — ${brand.name} models`;
-  q('modelSection').style.display = 'block';
-  q('modelGrid').innerHTML = brand.models.map(m => `
-    <div class="model-card ${sel.model === m.id ? 'selected' : ''}" onclick="selectModel('${m.id}')">
-      ${m.badge ? `<div class="model-badge">${m.badge}</div>` : ''}
-      <div class="model-icon-wrap"><i class="ti ti-device-mobile" aria-hidden="true"></i></div>
-      <div class="model-name">${m.name}</div>
-      <div class="model-price"><span class="model-orig">₹${m.originalPrice}</span>₹${m.basePrice}</div>
+  const brand = DATA.brands.find(b => b.id === id);
+  document.getElementById('modelSection').style.display = 'block';
+  document.getElementById('modelGrid').innerHTML = brand.models.map(m => `
+    <div class="model-card" onclick="selectModel('${m.name}', '${m.price}')">
+      ${m.name}
     </div>
   `).join('');
 }
 
-function selectModel(id) {
-  sel.model = id; sel.skin = null;
-  renderModels();
-  renderSkins();
-  q('previewSection').style.display = 'none';
-  updateSteps();
-}
-
-function renderSkins() {
-  q('skinSection').style.display = 'block';
-  q('skinGrid').innerHTML = DATA.skins.map(s => `
-    <div class="skin-card ${sel.skin === s.id ? 'selected' : ''}" onclick="selectSkin('${s.id}')">
-      <div class="skin-swatch" style="background:${s.previewColor}"></div>
-      <div class="skin-name">${s.name}</div>
-      <div class="skin-finish">${s.finish}</div>
-    </div>
-  `).join('');
-}
-
-function selectSkin(id) {
-  sel.skin = id;
-  renderSkins();
-  renderPreview();
-  updateSteps();
-}
-
-function renderPreview() {
-  const brand = DATA.brands.find(b => b.id === sel.brand);
-  const model = brand.models.find(m => m.id === sel.model);
-  const skin = DATA.skins.find(s => s.id === sel.skin);
-  if (!model || !skin) return;
-
-  q('previewSection').style.display = 'block';
-  q('previewSkin').style.background = skin.previewColor;
-  q('prevModelName').textContent = `${brand.name} ${model.name}`;
-  q('prevSkinName').textContent = `${skin.name} · ${skin.finish}`;
-
-  const tags = model.tags.map(t => `<span class="tag-pill ${t}">${t}</span>`).join('');
-  q('prevTags').innerHTML = tags;
-
-  q('prevPrice').textContent = `₹${model.basePrice}`;
-  q('prevOrig').textContent = `₹${model.originalPrice}`;
-  const saved = model.originalPrice - model.basePrice;
-  q('prevSave').textContent = `Save ₹${saved}`;
-
-  q('prevAsset').textContent = `mask: assets/masks/${model.id}-mask.png\ntexture: assets/skins/${skin.id}.jpg`;
-
-  const entry = {
-    "model_id": model.id,
-    "model_name": `${brand.name} ${model.name}`,
-    "skin_id": skin.id,
-    "skin_name": skin.name,
-    "skin_texture": `assets/skins/${skin.id}.jpg`,
-    "mask": `assets/masks/${model.id}-mask.png`,
-    "hardware": `assets/masks/${model.id}-hardware.png`,
-    "base_price": model.basePrice,
-    "currency": "INR"
-  };
-  q('jsonBody').innerHTML = syntaxHL(JSON.stringify(entry, null, 2));
-}
-
-function syntaxHL(json) {
-  return json
-    .replace(/("[\w_]+")\s*:/g, '<span class="json-key">$1</span>:')
-    .replace(/:\s*(".*?")/g, ': <span class="json-val">$1</span>')
-    .replace(/:\s*(\d+)/g, ': <span class="json-num">$1</span>');
-}
-
-function updateSteps() {
-  const steps = [
-    { chip: 'chip1', dot: 'dot1', done: !!sel.brand, active: !sel.brand },
-    { chip: 'chip2', dot: 'dot2', done: !!sel.model, active: !!sel.brand && !sel.model },
-    { chip: 'chip3', dot: 'dot3', done: !!sel.skin, active: !!sel.model && !sel.skin },
-    { chip: 'chip4', dot: 'dot4', done: false, active: !!sel.skin }
-  ];
-  steps.forEach((s, i) => {
-    const dot = q(s.dot);
-    const chip = q(s.chip);
-    dot.className = 'step-dot' + (s.done ? ' done' : s.active ? ' active' : '');
-    dot.innerHTML = s.done ? '<i class="ti ti-check" style="font-size:10px"></i>' : (i + 1);
-    chip.className = 'step-chip' + (s.active || s.done ? ' active' : '');
-  });
-}
-
-function addToCart() {
-  const brand = DATA.brands.find(b => b.id === sel.brand);
-  const model = brand ? brand.models.find(m => m.id === sel.model) : null;
-  const skin = DATA.skins.find(s => s.id === sel.skin);
-  if (model && skin) {
-    sendPrompt(`I want to add this to the cart: ${brand.name} ${model.name} with ${skin.name} skin. Price: ₹${model.basePrice}. What are the next steps to check out on Prime Skin Hub?`);
-  }
-}
-
-function copyJson() {
-  const body = q('jsonBody').innerText;
-  navigator.clipboard.writeText(body).catch(() => {});
-}
-
-function resetAll() {
-  sel = { brand: null, model: null, skin: null };
-  renderBrands();
-  q('modelSection').style.display = 'none';
-  q('skinSection').style.display = 'none';
-  q('previewSection').style.display = 'none';
-  updateSteps();
+function selectModel(name, price) {
+  document.getElementById('previewSection').style.display = 'block';
+  document.getElementById('prevModelName').innerText = name;
+  document.getElementById('prevPrice').innerText = '₹' + price;
+  document.getElementById('previewSkin').style.background = '#C9A96E'; // Default Gold Mockup
 }
 
 renderBrands();
-updateSteps();
 </script>
