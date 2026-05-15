@@ -1,232 +1,145 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizer — Prime Skin Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --dark: #0A0A0A;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(212, 175, 55, 0.3);
-        }
+<style>
+  :root {
+    --gold: #C9A96E;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --border: rgba(255, 255, 255, 0.1);
+  }
 
-        body {
-            background-color: var(--dark);
-            color: #fff;
-            font-family: 'DM Sans', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+  body {
+    background-color: var(--dark-bg);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
 
-        /* ─── TOP NAV ─── */
-        .top-nav {
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            z-index: 100;
-            background: linear-gradient(to bottom, var(--dark), transparent);
-        }
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 20px;
+  }
 
-        .back-btn { color: #fff; text-decoration: none; font-size: 20px; }
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
 
-        /* ─── MAIN PREVIEW ─── */
-        .visualizer-stage {
-            height: 70vh;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-            margin-top: 60px;
-        }
+  .header h1 {
+    font-size: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--gold);
+  }
 
-        .phone-container {
-            position: relative;
-            width: 220px;
-            height: 450px;
-            background: #111;
-            border-radius: 40px;
-            border: 8px solid #222;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 0 40px rgba(212, 175, 55, 0.1);
-            overflow: hidden;
-        }
+  /* THE PHONE MOCKUP */
+  .device-preview {
+    position: relative;
+    width: 220px;
+    height: 450px;
+    background: #111;
+    border: 12px solid #222;
+    border-radius: 40px;
+    margin: 0 auto 40px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    overflow: hidden;
+  }
 
-        .skin-layer {
-            position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center;
-            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+  /* This is the "Skin" that changes */
+  #skin-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    opacity: 0.8;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
-        .phone-frame {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 2;
-            background-image: url('https://i.imgur.com/your-transparent-iphone-frame.png'); /* Replace with your PNG */
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
+  .option-group {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 24px;
+    margin-top: 20px;
+  }
 
-        /* ─── SELECTION DRAWER ─── */
-        .bottom-drawer {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(15, 15, 15, 0.8);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            border-radius: 30px 30px 0 0;
-            padding: 30px 20px;
-            position: fixed;
-            bottom: 0;
-            z-index: 10;
-        }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 
-        .section-header {
-            font-family: 'Syne', sans-serif;
-            font-size: 14px;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-        }
+  .btn-choice {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+  }
 
-        .option-scroll {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding-bottom: 15px;
-            scrollbar-width: none;
-        }
+  .btn-choice:hover {
+    background: var(--gold);
+    color: #000;
+  }
 
-        .option-card {
-            min-width: 100px;
-            background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+  .price-section {
+    text-align: center;
+    margin-top: 30px;
+  }
 
-        .option-card.active {
-            border-color: var(--gold);
-            background: rgba(212, 175, 55, 0.1);
-        }
+  .price {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 15px;
+  }
 
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-        }
+  .buy-now {
+    width: 100%;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    padding: 18px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
 
-        .price-text { font-family: 'Syne'; font-size: 24px; color: var(--gold); }
+<div class="container">
+  <div class="header">
+    <h1>Prime Skin Hub</h1>
+    <p style="opacity:0.5; font-size:12px;">Premium Device Customizer</p>
+  </div>
 
-        .cta-button {
-            background: var(--gold);
-            color: #000;
-            padding: 15px 40px;
-            border-radius: 12px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            font-family: 'Syne';
-        }
-    </style>
-</head>
-<body>
+  <div class="device-preview">
+    <div id="skin-overlay"></div>
+  </div>
 
-    <div class="top-nav">
-        <a href="index.html" class="back-btn"><i class="ti ti-chevron-left"></i></a>
-        <div style="font-family:'Syne'; letter-spacing: 2px;">PRIME</div>
-        <i class="ti ti-shopping-cart" style="font-size: 20px;"></i>
+  <div class="option-group">
+    <p style="font-size: 14px; margin-bottom: 15px; opacity: 0.7;">Select Texture</p>
+    <div class="grid">
+      <button class="btn-choice" onclick="changeSkin('#C9A96E')">Gold Titanium</button>
+      <button class="btn-choice" onclick="changeSkin('#1a1a1a')">Carbon Fiber</button>
+      <button class="btn-choice" onclick="changeSkin('#8d8d8d')">Brushed Steel</button>
+      <button class="btn-choice" onclick="changeSkin('#2C1A0E')">Midnight Leather</button>
     </div>
+  </div>
 
-    <div class="visualizer-stage">
-        <div class="phone-container">
-            <div id="activeSkin" class="skin-layer" style="background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800');"></div>
-            <div class="phone-frame"></div>
-        </div>
-    </div>
-
-    <div class="bottom-drawer">
-        <div id="brandStep">
-            <div class="section-header">Select Brand</div>
-            <div class="option-scroll" id="brandGrid"></div>
-        </div>
-
-        <div id="skinStep" style="margin-top: 25px;">
-            <div class="section-header">Choose Texture</div>
-            <div class="option-scroll" id="skinGrid"></div>
-        </div>
-
-        <div class="price-row">
-            <div>
-                <div style="font-size: 10px; opacity: 0.5; text-transform: uppercase;">Total Price</div>
-                <div class="price-text" id="priceLabel">₹999</div>
-            </div>
-            <button class="cta-button">ADD TO CART</button>
-        </div>
-    </div>
+  <div class="price-section">
+    <div class="price">₹999</div>
+    <button class="buy-now">Add to Collection</button>
+  </div>
+</div>
 
 <script>
-    const DATA = {
-        brands: [
-            { id: 'apple', name: 'Apple', price: 999 },
-            { id: 'samsung', name: 'Samsung', price: 1199 },
-            { id: 'google', name: 'Google', price: 899 }
-        ],
-        skins: [
-            { id: 'gold', name: 'Liquid Gold', img: 'https://images.unsplash.com/photo-1502691876148-a84978e59af8?w=800' },
-            { id: 'carbon', name: 'Carbon Fiber', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800' },
-            { id: 'marble', name: 'White Marble', img: 'https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=800' }
-        ]
-    };
-
-    function init() {
-        const brandGrid = document.getElementById('brandGrid');
-        brandGrid.innerHTML = DATA.brands.map(b => `
-            <div class="option-card" onclick="setBrand('${b.id}', ${b.price}, this)">
-                <div style="font-size: 12px; font-weight: 500;">${b.name}</div>
-            </div>
-        `).join('');
-
-        const skinGrid = document.getElementById('skinGrid');
-        skinGrid.innerHTML = DATA.skins.map(s => `
-            <div class="option-card" onclick="setSkin('${s.img}', this)">
-                <div style="width:40px; height:40px; border-radius:50%; background:url('${s.img}'); background-size:cover; margin: 0 auto 10px;"></div>
-                <div style="font-size: 10px;">${s.name}</div>
-            </div>
-        `).join('');
-    }
-
-    function setBrand(id, price, el) {
-        document.querySelectorAll('#brandGrid .option-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('priceLabel').innerText = '₹' + price;
-    }
-
-    function setSkin(imgUrl, el) {
-        document.querySelectorAll('#skinGrid .option-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('activeSkin').style.backgroundImage = `url('${imgUrl}')`;
-    }
-
-    init();
+  function changeSkin(color) {
+    document.getElementById('skin-overlay').style.backgroundColor = color;
+  }
 </script>
-</body>
-</html>
