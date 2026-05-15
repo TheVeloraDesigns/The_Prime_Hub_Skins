@@ -1,8 +1,8 @@
 <style>
   :root {
     --gold: #C4A484;
-    --dark: #0f0f0f;
-    --card: #1a1a1a;
+    --dark: #0a0a0a;
+    --card: #141414;
     --border: rgba(255,255,255,0.1);
   }
 
@@ -13,55 +13,44 @@
 
   .app-container {
     display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
-    width: 100%; max-width: 1000px;
+    width: 100%; max-width: 1100px; padding: 40px;
   }
 
-  /* VISUALIZER BOX */
-  .preview-pane { position: sticky; top: 20px; height: 600px; text-align: center; }
+  /* STICKY PREVIEW PANE */
+  .preview-pane { position: sticky; top: 40px; height: 600px; text-align: center; }
   
-  .phone-frame {
-    width: 280px; height: 560px; margin: 0 auto; position: relative;
+  .visualizer-display {
+    width: 380px; height: 500px; margin: 0 auto;
     background-size: contain; background-repeat: no-repeat; background-position: center;
-    z-index: 1;
+    transition: background-image 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 20px 50px rgba(0,0,0,0.5));
   }
 
-  /* The Skin Overlay */
-  #skin-overlay {
-    position: absolute;
-    top: 5%; left: 5%; width: 90%; height: 90%;
-    background-size: cover; background-position: center;
-    border-radius: 35px;
-    opacity: 0.85;
-    z-index: 2; /* Sits on top of the phone */
-    transition: 0.5s ease;
-  }
-
-  /* UI BUTTONS */
-  .section-label { color: var(--gold); font-size: 12px; font-weight: bold; margin: 25px 0 10px; text-transform: uppercase; }
+  /* SELECTION UI */
+  .section-label { color: var(--gold); font-size: 11px; font-weight: 800; margin: 30px 0 12px; text-transform: uppercase; letter-spacing: 1px; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   
   .btn {
     background: var(--card); border: 1px solid var(--border);
-    padding: 15px; border-radius: 12px; color: #fff; cursor: pointer; text-align: center;
+    padding: 16px; border-radius: 12px; color: #fff; cursor: pointer; 
+    text-align: center; font-size: 14px; transition: 0.2s;
   }
-  .btn:hover { border-color: var(--gold); }
-  
-  .texture-btn {
-    height: 60px; border-radius: 10px; border: 2px solid transparent; 
-    background-size: cover; cursor: pointer;
-  }
+  .btn:hover { border-color: var(--gold); background: rgba(196, 164, 132, 0.05); }
+  .btn.active { border-color: var(--gold); background: var(--gold); color: #000; font-weight: bold; }
+
+  @media (max-width: 900px) { .app-container { grid-template-columns: 1fr; } .preview-pane { position: relative; height: auto; } }
 </style>
 
 <div class="app-container">
   <div class="preview-pane">
-    <div id="phone-main" class="phone-frame">
-        <div id="skin-overlay"></div>
-    </div>
-    <h2 id="display-name" style="margin-top:20px;">iPhone 15 Pro</h2>
+    <div id="main-display" class="visualizer-display"></div>
+    <h2 id="config-label" style="margin-top:20px; font-size: 18px; letter-spacing: 1px;">iPhone 15 Pro</h2>
+    <p id="skin-label" style="opacity: 0.5; font-size: 14px;">Select a Skin</p>
   </div>
 
   <div class="selection-pane">
-    <h1 style="font-size: 24px;">Prime Skin Hub</h1>
+    <h1 style="font-size: 28px; margin-bottom: 5px;">Prime Skin Hub</h1>
+    <p style="opacity: 0.4; font-size: 13px;">Custom Hardware Visualizer</p>
     
     <div class="section-label">01. Select Brand</div>
     <div class="grid" id="brand-btns"></div>
@@ -69,62 +58,73 @@
     <div class="section-label">02. Select Model</div>
     <div class="grid" id="model-btns"></div>
 
-    <div class="section-label">03. Choose Skin</div>
+    <div class="section-label">03. Choose Texture</div>
     <div class="grid" id="skin-btns"></div>
+    
+    <button style="margin-top: 40px; width: 100%; background: var(--gold); color: #000; padding: 20px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer;">
+        ADD TO COLLECTION — ₹999
+    </button>
   </div>
 </div>
 
 <script>
-const DB = {
-  brands: [
-    { id: 'apple', name: 'Apple', models: [
-        { name: 'iPhone 15 Pro', img: 'image_d2711a.png' },
-        { name: 'iPhone 15 Pro Max', img: 'image_d2711a.png' }
-    ]},
-    { id: 'samsung', name: 'Samsung', models: [
-        { name: 'S24 Ultra', img: 'image_d269b7.png' },
-        { name: 'S23 Ultra', img: 'image_d269b7.png' }
-    ]},
-    { id: 'google', name: 'Google', models: [
-        { name: 'Pixel 8 Pro', img: 'image_d26656.png' },
-        { name: 'Pixel 7 Pro', img: 'image_d265fd.png' }
-    ]}
-  ],
-  skins: [
-    { name: 'Carbon Fibre', img: 'download.jpg' },
-    { name: 'Titanium Gold', img: 'Screenshot 2026-05-16 at 12.29.58 AM.png' }
-  ]
+const STORE = {
+  apple: {
+    base: "https://www.capesindia.com/cdn/shop/files/iphone-15-pro-glass-back_matte-transparent-guard_ccf55ab5-b3c5-4b78-b9d5-9242130bf99a.jpg?v=1747221684&width=800",
+    models: ["iPhone 15 Pro", "iPhone 15 Pro Max"],
+    skins: [
+      { name: "Carbon Fibre", url: "https://www.capesindia.com/cdn/shop/products/iphone-15-pro-max-glass-back_carbon-fibre-black_2379de7c-e561-4ae3-876b-2c36bf3547f7.jpg?v=1747221662&width=800" },
+      { name: "Lava", url: "https://www.capesindia.com/cdn/shop/files/iphone-15-pro-max-glass-back_lava_a017cbf6-fb06-49b2-8354-c71927ccca4a.jpg?v=1747221663&width=800" }
+    ]
+  },
+  samsung: {
+    base: "https://www.capesindia.com/cdn/shop/files/samsung-galaxy-s24-ultra-glass-back_matte-transparent-guard_d1244db8-2f36-46af-b55b-bff84d8091ef.jpg?v=1747220810&width=800",
+    models: ["S24 Ultra", "S23 Ultra"],
+    skins: [
+      { name: "Black Camo", url: "https://www.capesindia.com/cdn/shop/products/samsung-galaxy-s24-ultra-glass-back_black-camo.jpg?v=1747220808&width=800" },
+      { name: "Walnut", url: "https://www.capesindia.com/cdn/shop/products/samsung-galaxy-s24-glass-back_walnut.jpg?v=1747220826&width=800" }
+    ]
+  }
 };
 
+let currentBrand = 'apple';
+
 function init() {
-  // Load Brands
-  document.getElementById('brand-btns').innerHTML = DB.brands.map(b => 
-    `<div class="btn" onclick="showModels('${b.id}')">${b.name}</div>`
+  const brandArea = document.getElementById('brand-btns');
+  brandArea.innerHTML = Object.keys(STORE).map(key => 
+    `<div class="btn ${currentBrand === key ? 'active' : ''}" onclick="selectBrand('${key}')">${key.toUpperCase()}</div>`
   ).join('');
 
-  // Load Skins
-  document.getElementById('skin-btns').innerHTML = DB.skins.map(s => 
-    `<div class="texture-btn" style="background-image: url('${s.img}')" onclick="applySkin('${s.img}')"></div>`
+  selectBrand(currentBrand);
+}
+
+function selectBrand(key) {
+  currentBrand = key;
+  const brandData = STORE[key];
+  
+  // Render Models
+  document.getElementById('model-btns').innerHTML = brandData.models.map(m => 
+    `<div class="btn" onclick="updatePreview('${brandData.base}', '${m}')">${m}</div>`
   ).join('');
 
-  // Load a default view so it's not black
-  applyModel('iPhone 15 Pro', 'image_d2711a.png');
-}
-
-function showModels(brandId) {
-  const brand = DB.brands.find(b => b.id === brandId);
-  document.getElementById('model-btns').innerHTML = brand.models.map(m => 
-    `<div class="btn" onclick="applyModel('${m.name}', '${m.img}')">${m.name}</div>`
+  // Render Skins
+  document.getElementById('skin-btns').innerHTML = brandData.skins.map(s => 
+    `<div class="btn" onclick="updatePreview('${s.url}', null, '${s.name}')">${s.name}</div>`
   ).join('');
+
+  // Default Load
+  updatePreview(brandData.base, brandData.models[0]);
+  
+  // Highlight active brand
+  document.querySelectorAll('#brand-btns .btn').forEach(btn => {
+    btn.classList.toggle('active', btn.innerText.toLowerCase() === key);
+  });
 }
 
-function applyModel(name, imgPath) {
-  document.getElementById('phone-main').style.backgroundImage = `url('${imgPath}')`;
-  document.getElementById('display-name').innerText = name;
-}
-
-function applySkin(skinImg) {
-  document.getElementById('skin-overlay').style.backgroundImage = `url('${skinImg}')`;
+function updatePreview(imgUrl, modelName, skinName) {
+  document.getElementById('main-display').style.backgroundImage = `url('${imgUrl}')`;
+  if(modelName) document.getElementById('config-label').innerText = modelName;
+  if(skinName) document.getElementById('skin-label').innerText = skinName;
 }
 
 init();
