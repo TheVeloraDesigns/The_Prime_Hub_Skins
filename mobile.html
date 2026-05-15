@@ -1,40 +1,78 @@
 <style>
-  /* ... keep your root and body styles ... */
-
-  .phone-container {
-    width: 300px; 
-    height: 600px; 
-    margin: 0 auto; 
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  :root {
+    --gold: #C4A484;
+    --dark: #0f0f0f;
+    --card: #1a1a1a;
+    --border: rgba(255,255,255,0.1);
   }
 
-  /* BASE LAYER: The Phone Image */
-  #phone-display {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    z-index: 1; /* Behind the skin */
+  body { 
+    background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; 
+    margin: 0; padding: 20px; display: flex; justify-content: center;
   }
 
-  /* SKIN LAYER: The Texture */
-  #skin-layer {
+  .app-container {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+    width: 100%; max-width: 1000px;
+  }
+
+  /* VISUALIZER BOX */
+  .preview-pane { position: sticky; top: 20px; height: 600px; text-align: center; }
+  
+  .phone-frame {
+    width: 280px; height: 560px; margin: 0 auto; position: relative;
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+    z-index: 1;
+  }
+
+  /* The Skin Overlay */
+  #skin-overlay {
     position: absolute;
-    width: 72%; /* Adjusted to fit inside the screen area roughly */
-    height: 85%;
-    background-size: cover;
-    transition: 0.4s ease;
-    border-radius: 30px;
-    z-index: 2; /* On top of the phone */
-    opacity: 0.8;
-    pointer-events: none; /* Let's you click through it */
+    top: 5%; left: 5%; width: 90%; height: 90%;
+    background-size: cover; background-position: center;
+    border-radius: 35px;
+    opacity: 0.85;
+    z-index: 2; /* Sits on top of the phone */
+    transition: 0.5s ease;
+  }
+
+  /* UI BUTTONS */
+  .section-label { color: var(--gold); font-size: 12px; font-weight: bold; margin: 25px 0 10px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  
+  .btn {
+    background: var(--card); border: 1px solid var(--border);
+    padding: 15px; border-radius: 12px; color: #fff; cursor: pointer; text-align: center;
+  }
+  .btn:hover { border-color: var(--gold); }
+  
+  .texture-btn {
+    height: 60px; border-radius: 10px; border: 2px solid transparent; 
+    background-size: cover; cursor: pointer;
   }
 </style>
+
+<div class="app-container">
+  <div class="preview-pane">
+    <div id="phone-main" class="phone-frame">
+        <div id="skin-overlay"></div>
+    </div>
+    <h2 id="display-name" style="margin-top:20px;">iPhone 15 Pro</h2>
+  </div>
+
+  <div class="selection-pane">
+    <h1 style="font-size: 24px;">Prime Skin Hub</h1>
+    
+    <div class="section-label">01. Select Brand</div>
+    <div class="grid" id="brand-btns"></div>
+
+    <div class="section-label">02. Select Model</div>
+    <div class="grid" id="model-btns"></div>
+
+    <div class="section-label">03. Choose Skin</div>
+    <div class="grid" id="skin-btns"></div>
+  </div>
+</div>
 
 <script>
 const DB = {
@@ -58,30 +96,35 @@ const DB = {
   ]
 };
 
-// Initial setup to avoid the black screen
 function init() {
-  renderBrands();
-  renderSkins();
-  // Set a default model so it's not empty on load
+  // Load Brands
+  document.getElementById('brand-btns').innerHTML = DB.brands.map(b => 
+    `<div class="btn" onclick="showModels('${b.id}')">${b.name}</div>`
+  ).join('');
+
+  // Load Skins
+  document.getElementById('skin-btns').innerHTML = DB.skins.map(s => 
+    `<div class="texture-btn" style="background-image: url('${s.img}')" onclick="applySkin('${s.img}')"></div>`
+  ).join('');
+
+  // Load a default view so it's not black
   applyModel('iPhone 15 Pro', 'image_d2711a.png');
 }
 
-function selectBrand(brandId) {
+function showModels(brandId) {
   const brand = DB.brands.find(b => b.id === brandId);
-  const modelGrid = document.getElementById('model-grid');
-  modelGrid.innerHTML = brand.models.map(m => `
-    <div class="card" onclick="applyModel('${m.name}', '${m.img}')">${m.name}</div>
-  `).join('');
+  document.getElementById('model-btns').innerHTML = brand.models.map(m => 
+    `<div class="btn" onclick="applyModel('${m.name}', '${m.img}')">${m.name}</div>`
+  ).join('');
 }
 
-function applyModel(name, img) {
-  // We use the full path to make sure GitHub finds it
-  document.getElementById('phone-display').style.backgroundImage = `url('${img}')`;
-  document.getElementById('model-name').innerText = name;
+function applyModel(name, imgPath) {
+  document.getElementById('phone-main').style.backgroundImage = `url('${imgPath}')`;
+  document.getElementById('display-name').innerText = name;
 }
 
-function applySkin(img) {
-  document.getElementById('skin-layer').style.backgroundImage = `url('${img}')`;
+function applySkin(skinImg) {
+  document.getElementById('skin-overlay').style.backgroundImage = `url('${skinImg}')`;
 }
 
 init();
