@@ -2,156 +2,116 @@
   :root {
     --gold: #C4A484;
     --dark: #080808;
-    --card-bg: #111111;
-    --border: rgba(255,255,255,0.08);
-    --text-dim: #888;
+    --card-bg: #111;
+    --border: rgba(255,255,255,0.1);
   }
 
-  body { 
-    background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; 
-    margin: 0; display: flex; justify-content: center; overflow-x: hidden;
-  }
+  body { background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; }
+  .app-container { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; width: 100%; max-width: 1100px; padding: 40px 20px; }
 
-  .app-container {
-    display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px;
-    width: 100%; max-width: 1100px; padding: 40px 20px;
-  }
-
-  /* LEFT: STICKY PREVIEW */
+  /* PREVIEW SYSTEM */
   .visualizer-pane { position: sticky; top: 40px; height: fit-content; text-align: center; }
   
-  .phone-mockup {
-    width: 260px; height: 530px; background: #000; border: 10px solid #1a1a1a;
-    border-radius: 45px; margin: 0 auto; position: relative; overflow: hidden;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+  .phone-container {
+    width: 300px; height: 600px; margin: 0 auto; position: relative;
+    background-size: contain; background-repeat: no-repeat; background-position: center;
   }
 
-  #active-skin {
-    position: absolute; inset: 0; background-size: cover; 
-    background-position: center; transition: 0.6s cubic-bezier(0.2, 1, 0.2, 1);
+  /* This layer holds the skin texture */
+  #skin-layer {
+    position: absolute;
+    top: 10%; left: 10%; width: 80%; height: 80%; /* Adjusted to fit inside the phone body */
+    background-size: cover;
+    mix-blend-mode: multiply; /* This keeps the phone shadows/details visible */
+    transition: 0.4s ease;
+    border-radius: 20px;
+    opacity: 0.9;
   }
 
-  /* RIGHT: SELECTION ENGINE */
-  .selection-pane { padding-bottom: 100px; }
-  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 30px 0 15px; font-weight: 700; }
+  /* SELECTION UI */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+  .card { 
+    background: var(--card-bg); border: 1px solid var(--border); padding: 15px; 
+    border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s;
+  }
+  .card.active { border-color: var(--gold); background: rgba(196, 164, 132, 0.1); }
   
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  
-  .card {
-    background: var(--card-bg); border: 1px solid var(--border);
-    padding: 20px; border-radius: 16px; cursor: pointer; transition: 0.3s;
-    text-align: center; font-weight: 500; font-size: 14px;
-  }
-
-  .card:hover { border-color: var(--gold); background: rgba(196, 164, 132, 0.05); }
-  .card.active { border-color: var(--gold); background: var(--gold); color: #000; }
-
   .texture-card {
-    height: 80px; border-radius: 16px; position: relative; overflow: hidden;
-    border: 2px solid transparent; background-size: cover;
+    height: 60px; border-radius: 10px; border: 2px solid transparent; 
+    background-size: cover; cursor: pointer;
   }
-  .texture-card.active { border-color: var(--gold); transform: scale(0.98); }
-  .texture-name { position: absolute; bottom: 8px; width: 100%; font-size: 10px; text-transform: uppercase; font-weight: 800; background: rgba(0,0,0,0.4); }
-
-  .cta-bar {
-    position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,8,8,0.9);
-    backdrop-filter: blur(20px); padding: 20px; border-top: 1px solid var(--border);
-    display: flex; justify-content: center; z-index: 100;
-  }
-  .buy-btn {
-    width: 100%; max-width: 400px; background: var(--gold); color: #000;
-    border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer;
-  }
-
-  @media (max-width: 850px) {
-    .app-container { grid-template-columns: 1fr; }
-    .visualizer-pane { position: relative; top: 0; margin-bottom: 40px; }
-  }
+  .texture-card.active { border-color: var(--gold); }
 </style>
 
 <div class="app-container">
   <div class="visualizer-pane">
-    <div class="phone-mockup">
-      <div id="active-skin" style="background-color: #222;"></div>
+    <div id="phone-display" class="phone-container">
+        <div id="skin-layer"></div>
     </div>
-    <h2 id="display-model" style="margin-top:20px; font-size: 20px;">Select Device</h2>
-    <p id="display-skin" style="color: var(--text-dim); font-size: 14px;">Original Finish</p>
+    <h2 id="model-name">Select Model</h2>
   </div>
 
   <div class="selection-pane">
-    <h1 style="font-size: 32px; margin: 0;">Prime Skin Hub</h1>
-    <p style="color: var(--text-dim); margin-bottom: 40px;">Hardware Visualizer v1.0</p>
-
-    <div class="section-label">01. Choose Brand</div>
+    <h1>Prime Skin Hub</h1>
+    
+    <div class="label">Brand</div>
     <div class="grid" id="brand-grid"></div>
 
-    <div class="section-label">02. Choose Model</div>
+    <div class="label">Model</div>
     <div class="grid" id="model-grid"></div>
 
-    <div class="section-label">03. Select Series</div>
+    <div class="label">Skin Texture</div>
     <div class="grid" id="skin-grid"></div>
   </div>
-</div>
-
-<div class="cta-bar">
-  <button class="buy-btn">Confirm Configuration — ₹999</button>
 </div>
 
 <script>
 const DB = {
   brands: [
-    { id: 'apple', name: 'Apple', models: ['iPhone 15 Pro', 'iPhone 15 Pro Max'] },
-    { id: 'samsung', name: 'Samsung', models: ['Galaxy S24 Ultra', 'Galaxy S23 Ultra'] },
-    { id: 'google', name: 'Google', models: ['Pixel 8 Pro', 'Pixel 7 Pro'] }
+    { id: 'apple', name: 'Apple', models: [
+        { name: 'iPhone 15 Pro', img: 'image_d2711a.png' },
+        { name: 'iPhone 15 Pro Max', img: 'image_d2711a.png' }
+    ]},
+    { id: 'samsung', name: 'Samsung', models: [
+        { name: 'S24 Ultra', img: 'image_d269b7.png' },
+        { name: 'S23 Ultra', img: 'image_d269b7.png' }
+    ]},
+    { id: 'google', name: 'Google', models: [
+        { name: 'Pixel 8 Pro', img: 'image_d26656.png' },
+        { name: 'Pixel 7 Pro', img: 'image_d265fd.png' }
+    ]}
   ],
   skins: [
-    { name: 'Carbon Fiber', color: '#1a1a1a', img: 'https://www.transparenttextures.com/patterns/carbon-fibre.png' },
-    { name: 'Titanium Gold', color: '#C4A484', img: 'https://www.transparenttextures.com/patterns/brushed-alum.png' }
+    { name: 'Carbon Fibre', img: 'download.jpg' },
+    { name: 'Titanium Gold', img: 'Screenshot 2026-05-16 at 12.29.58 AM.png' }
   ]
 };
 
-let current = { brand: null, model: null, skin: null };
-
 function init() {
-  renderBrands();
-  renderSkins();
-}
-
-function renderBrands() {
-  document.getElementById('brand-grid').innerHTML = DB.brands.map(b => `
-    <div class="card ${current.brand === b.id ? 'active' : ''}" onclick="setBrand('${b.id}')">${b.name}</div>
+  const brandGrid = document.getElementById('brand-grid');
+  brandGrid.innerHTML = DB.brands.map(b => `<div class="card" onclick="selectBrand('${b.id}')">${b.name}</div>`).join('');
+  
+  const skinGrid = document.getElementById('skin-grid');
+  skinGrid.innerHTML = DB.skins.map(s => `
+    <div class="texture-card" style="background-image: url('${s.img}')" onclick="applySkin('${s.img}')"></div>
   `).join('');
 }
 
-function setBrand(id) {
-  current.brand = id;
-  current.model = null;
-  renderBrands();
-  const brand = DB.brands.find(b => b.id === id);
-  document.getElementById('model-grid').innerHTML = brand.models.map(m => `
-    <div class="card ${current.model === m ? 'active' : ''}" onclick="setModel('${m}')">${m}</div>
+function selectBrand(brandId) {
+  const brand = DB.brands.find(b => b.id === brandId);
+  const modelGrid = document.getElementById('model-grid');
+  modelGrid.innerHTML = brand.models.map(m => `
+    <div class="card" onclick="applyModel('${m.name}', '${m.img}')">${m.name}</div>
   `).join('');
 }
 
-function setModel(name) {
-  current.model = name;
-  document.getElementById('display-model').innerText = name;
-  setBrand(current.brand); // Refresh model active state
+function applyModel(name, img) {
+  document.getElementById('phone-display').style.backgroundImage = `url('${img}')`;
+  document.getElementById('model-name').innerText = name;
 }
 
-function renderSkins() {
-  document.getElementById('skin-grid').innerHTML = DB.skins.map(s => `
-    <div class="texture-card" style="background-color: ${s.color}; background-image: url('${s.img}')" onclick="setSkin('${s.name}', '${s.color}', '${s.img}')">
-      <div class="texture-name">${s.name}</div>
-    </div>
-  `).join('');
-}
-
-function setSkin(name, color, img) {
-  const el = document.getElementById('active-skin');
-  el.style.backgroundColor = color;
-  el.style.backgroundImage = `url('${img}')`;
-  document.getElementById('display-skin').innerText = name;
+function applySkin(img) {
+  document.getElementById('skin-layer').style.backgroundImage = `url('${img}')`;
 }
 
 init();
