@@ -4,211 +4,229 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizer — Prime Skin Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <style>
         :root {
             --gold: #D4AF37;
             --dark: #0A0A0A;
-            --card-bg: #141414;
-            --text-main: #FAFAFA;
-            --text-dim: #A1A1AA;
-            --border: rgba(212, 175, 55, 0.2);
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(212, 175, 55, 0.3);
         }
 
         body {
             background-color: var(--dark);
-            color: var(--text-main);
-            font-family: 'Syne', 'DM Sans', sans-serif;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
             margin: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ─── TOP NAV ─── */
+        .top-nav {
+            width: 100%;
             padding: 20px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(to bottom, var(--dark), transparent);
+        }
+
+        .back-btn { color: #fff; text-decoration: none; font-size: 20px; }
+
+        /* ─── MAIN PREVIEW ─── */
+        .visualizer-stage {
+            height: 70vh;
+            width: 100%;
+            display: flex;
             justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            margin-top: 60px;
         }
 
-        .psh-wrap { width: 100%; max-width: 450px; }
-
-        /* HEADER */
-        .psh-header {
-            background: linear-gradient(145deg, #1a1a1a, #000);
-            padding: 25px;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .psh-title { font-size: 20px; font-weight: 700; color: var(--gold); margin: 0; letter-spacing: 1px; }
-        .psh-sub { font-size: 12px; color: var(--text-dim); margin-top: 5px; }
-
-        /* SECTION LABELS */
-        .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 20px 0 10px 5px; opacity: 0.8; }
-
-        /* GRIDS */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .card.selected { border-color: var(--gold); background: var(--gold); color: var(--dark); font-weight: bold; }
-
-        /* THE LAYERED VISUALIZER */
-        .preview-container {
-            background: #000;
-            border-radius: 32px;
-            padding: 40px 20px;
-            margin-top: 30px;
-            border: 1px solid var(--border);
-            text-align: center;
+        .phone-container {
             position: relative;
+            width: 220px;
+            height: 450px;
+            background: #111;
+            border-radius: 40px;
+            border: 8px solid #222;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 0 40px rgba(212, 175, 55, 0.1);
             overflow: hidden;
         }
 
-        .phone-mockup {
-            width: 160px;
-            height: 320px;
-            margin: 0 auto;
-            position: relative;
-            background: #111;
-            border-radius: 30px;
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
-        }
-
-        /* LAYER 1: The Skin (Bottom) */
-        .layer-skin {
-            position: absolute;
-            inset: 8px; /* Slightly inside the frame */
-            border-radius: 22px;
-            background-size: cover;
-            background-position: center;
-            z-index: 1;
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* LAYER 2: The Device Frame (Top/Transparent PNG) */
-        .layer-frame {
+        .skin-layer {
             position: absolute;
             inset: 0;
-            z-index: 2;
-            background-size: contain;
-            background-repeat: no-repeat;
-            pointer-events: none; /* Allows clicking through to skin if needed */
+            background-size: cover;
+            background-position: center;
+            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        .price-tag { font-size: 28px; color: var(--gold); font-weight: 700; margin: 20px 0 10px; }
-        
-        .buy-btn {
-            background: var(--gold);
-            color: var(--dark);
-            border: none;
+        .phone-frame {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background-image: url('https://i.imgur.com/your-transparent-iphone-frame.png'); /* Replace with your PNG */
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        /* ─── SELECTION DRAWER ─── */
+        .bottom-drawer {
             width: 100%;
-            padding: 18px;
-            border-radius: 14px;
-            font-weight: 800;
+            max-width: 500px;
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            border-radius: 30px 30px 0 0;
+            padding: 30px 20px;
+            position: fixed;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .section-header {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            color: var(--gold);
             text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .option-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scrollbar-width: none;
+        }
+
+        .option-card {
+            min-width: 100px;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
             cursor: pointer;
-            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .option-card.active {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .price-text { font-family: 'Syne'; font-size: 24px; color: var(--gold); }
+
+        .cta-button {
+            background: var(--gold);
+            color: #000;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-family: 'Syne';
         }
     </style>
 </head>
 <body>
 
-<div class="psh-wrap">
-    <div class="psh-header">
-        <h1 class="psh-title">PRIME SKIN HUB</h1>
-        <p class="psh-sub">PREMIUM DEVICE VISUALIZER</p>
+    <div class="top-nav">
+        <a href="index.html" class="back-btn"><i class="ti ti-chevron-left"></i></a>
+        <div style="font-family:'Syne'; letter-spacing: 2px;">PRIME</div>
+        <i class="ti ti-shopping-cart" style="font-size: 20px;"></i>
     </div>
 
-    <div class="section-label">01. Select Brand</div>
-    <div class="grid" id="brandGrid"></div>
-
-    <div id="modelSection" style="display:none;">
-        <div class="section-label">02. Select Model</div>
-        <div class="grid" id="modelGrid"></div>
-    </div>
-
-    <div id="previewSection" style="display:none;">
-        <div class="preview-container">
-            <div class="phone-mockup">
-                <div id="skinLayer" class="layer-skin"></div>
-                <div id="frameLayer" class="layer-frame"></div>
-            </div>
-            
-            <h2 id="displayModel" style="margin-top:20px; font-size:18px;">Device Name</h2>
-            <div class="price-tag" id="displayPrice">₹0</div>
-            <button class="buy-btn" onclick="alert('Order Placed!')">Add to Cart</button>
+    <div class="visualizer-stage">
+        <div class="phone-container">
+            <div id="activeSkin" class="skin-layer" style="background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800');"></div>
+            <div class="phone-frame"></div>
         </div>
     </div>
-</div>
+
+    <div class="bottom-drawer">
+        <div id="brandStep">
+            <div class="section-header">Select Brand</div>
+            <div class="option-scroll" id="brandGrid"></div>
+        </div>
+
+        <div id="skinStep" style="margin-top: 25px;">
+            <div class="section-header">Choose Texture</div>
+            <div class="option-scroll" id="skinGrid"></div>
+        </div>
+
+        <div class="price-row">
+            <div>
+                <div style="font-size: 10px; opacity: 0.5; text-transform: uppercase;">Total Price</div>
+                <div class="price-text" id="priceLabel">₹999</div>
+            </div>
+            <button class="cta-button">ADD TO CART</button>
+        </div>
+    </div>
 
 <script>
     const DATA = {
         brands: [
-            { 
-                id: "apple", 
-                name: "Apple", 
-                models: [
-                    { id: "ip15", name: "iPhone 15 Pro", price: "999", frame: "https://www.apple.com/v/iphone-15-pro/c/images/overview/welcome/hero_endframe__cvklg0xk9w6e_large.jpg" },
-                    { id: "ip16", name: "iPhone 16 Pro", price: "1099", frame: "YOUR_IP16_FRAME_URL" }
-                ] 
-            },
-            { 
-                id: "samsung", 
-                name: "Samsung", 
-                models: [
-                    { id: "s24", name: "S24 Ultra", price: "1299", frame: "YOUR_S24_FRAME_URL" }
-                ] 
-            }
+            { id: 'apple', name: 'Apple', price: 999 },
+            { id: 'samsung', name: 'Samsung', price: 1199 },
+            { id: 'google', name: 'Google', price: 899 }
         ],
         skins: [
-            { id: "carbon", name: "Carbon Fiber", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500" },
-            { id: "gold", name: "Liquid Gold", img: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?w=500" }
+            { id: 'gold', name: 'Liquid Gold', img: 'https://images.unsplash.com/photo-1502691876148-a84978e59af8?w=800' },
+            { id: 'carbon', name: 'Carbon Fiber', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800' },
+            { id: 'marble', name: 'White Marble', img: 'https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=800' }
         ]
     };
 
     function init() {
-        const grid = document.getElementById('brandGrid');
-        grid.innerHTML = DATA.brands.map(b => `
-            <div class="card" onclick="selectBrand('${b.id}')">${b.name}</div>
+        const brandGrid = document.getElementById('brandGrid');
+        brandGrid.innerHTML = DATA.brands.map(b => `
+            <div class="option-card" onclick="setBrand('${b.id}', ${b.price}, this)">
+                <div style="font-size: 12px; font-weight: 500;">${b.name}</div>
+            </div>
+        `).join('');
+
+        const skinGrid = document.getElementById('skinGrid');
+        skinGrid.innerHTML = DATA.skins.map(s => `
+            <div class="option-card" onclick="setSkin('${s.img}', this)">
+                <div style="width:40px; height:40px; border-radius:50%; background:url('${s.img}'); background-size:cover; margin: 0 auto 10px;"></div>
+                <div style="font-size: 10px;">${s.name}</div>
+            </div>
         `).join('');
     }
 
-    function selectBrand(brandId) {
-        const brand = DATA.brands.find(b => b.id === brandId);
-        const modelSection = document.getElementById('modelSection');
-        const modelGrid = document.getElementById('modelGrid');
-        
-        modelSection.style.display = 'block';
-        modelGrid.innerHTML = brand.models.map(m => `
-            <div class="card" onclick="selectModel('${brandId}', '${m.id}')">${m.name}</div>
-        `).join('');
+    function setBrand(id, price, el) {
+        document.querySelectorAll('#brandGrid .option-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('priceLabel').innerText = '₹' + price;
     }
 
-    function selectModel(brandId, modelId) {
-        const brand = DATA.brands.find(b => b.id === brandId);
-        const model = brand.models.find(m => m.id === modelId);
-        
-        document.getElementById('previewSection').style.display = 'block';
-        document.getElementById('displayModel').innerText = model.name;
-        document.getElementById('displayPrice').innerText = '₹' + model.price;
-        
-        // Update Frame (Top Layer)
-        document.getElementById('frameLayer').style.backgroundImage = `url('${model.frame}')`;
-        
-        // Set a default skin for now
-        document.getElementById('skinLayer').style.backgroundImage = `url('${DATA.skins[0].img}')`;
+    function setSkin(imgUrl, el) {
+        document.querySelectorAll('#skinGrid .option-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('activeSkin').style.backgroundImage = `url('${imgUrl}')`;
     }
 
     init();
 </script>
-
 </body>
 </html>
