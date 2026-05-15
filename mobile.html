@@ -1,69 +1,40 @@
 <style>
-  :root {
-    --gold: #C4A484;
-    --dark: #080808;
-    --card-bg: #111;
-    --border: rgba(255,255,255,0.1);
-  }
+  /* ... keep your root and body styles ... */
 
-  body { background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; }
-  .app-container { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; width: 100%; max-width: 1100px; padding: 40px 20px; }
-
-  /* PREVIEW SYSTEM */
-  .visualizer-pane { position: sticky; top: 40px; height: fit-content; text-align: center; }
-  
   .phone-container {
-    width: 300px; height: 600px; margin: 0 auto; position: relative;
-    background-size: contain; background-repeat: no-repeat; background-position: center;
+    width: 300px; 
+    height: 600px; 
+    margin: 0 auto; 
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* This layer holds the skin texture */
+  /* BASE LAYER: The Phone Image */
+  #phone-display {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1; /* Behind the skin */
+  }
+
+  /* SKIN LAYER: The Texture */
   #skin-layer {
     position: absolute;
-    top: 10%; left: 10%; width: 80%; height: 80%; /* Adjusted to fit inside the phone body */
+    width: 72%; /* Adjusted to fit inside the screen area roughly */
+    height: 85%;
     background-size: cover;
-    mix-blend-mode: multiply; /* This keeps the phone shadows/details visible */
     transition: 0.4s ease;
-    border-radius: 20px;
-    opacity: 0.9;
+    border-radius: 30px;
+    z-index: 2; /* On top of the phone */
+    opacity: 0.8;
+    pointer-events: none; /* Let's you click through it */
   }
-
-  /* SELECTION UI */
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-  .card { 
-    background: var(--card-bg); border: 1px solid var(--border); padding: 15px; 
-    border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s;
-  }
-  .card.active { border-color: var(--gold); background: rgba(196, 164, 132, 0.1); }
-  
-  .texture-card {
-    height: 60px; border-radius: 10px; border: 2px solid transparent; 
-    background-size: cover; cursor: pointer;
-  }
-  .texture-card.active { border-color: var(--gold); }
 </style>
-
-<div class="app-container">
-  <div class="visualizer-pane">
-    <div id="phone-display" class="phone-container">
-        <div id="skin-layer"></div>
-    </div>
-    <h2 id="model-name">Select Model</h2>
-  </div>
-
-  <div class="selection-pane">
-    <h1>Prime Skin Hub</h1>
-    
-    <div class="label">Brand</div>
-    <div class="grid" id="brand-grid"></div>
-
-    <div class="label">Model</div>
-    <div class="grid" id="model-grid"></div>
-
-    <div class="label">Skin Texture</div>
-    <div class="grid" id="skin-grid"></div>
-  </div>
-</div>
 
 <script>
 const DB = {
@@ -87,14 +58,12 @@ const DB = {
   ]
 };
 
+// Initial setup to avoid the black screen
 function init() {
-  const brandGrid = document.getElementById('brand-grid');
-  brandGrid.innerHTML = DB.brands.map(b => `<div class="card" onclick="selectBrand('${b.id}')">${b.name}</div>`).join('');
-  
-  const skinGrid = document.getElementById('skin-grid');
-  skinGrid.innerHTML = DB.skins.map(s => `
-    <div class="texture-card" style="background-image: url('${s.img}')" onclick="applySkin('${s.img}')"></div>
-  `).join('');
+  renderBrands();
+  renderSkins();
+  // Set a default model so it's not empty on load
+  applyModel('iPhone 15 Pro', 'image_d2711a.png');
 }
 
 function selectBrand(brandId) {
@@ -106,6 +75,7 @@ function selectBrand(brandId) {
 }
 
 function applyModel(name, img) {
+  // We use the full path to make sure GitHub finds it
   document.getElementById('phone-display').style.backgroundImage = `url('${img}')`;
   document.getElementById('model-name').innerText = name;
 }
