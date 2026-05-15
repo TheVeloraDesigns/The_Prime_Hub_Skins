@@ -1,157 +1,214 @@
-<style>
-  :root {
-    --gold: #C9A96E;
-    --dark: #121212;
-    --card-bg: #ffffff;
-    --text: #1a1a1a;
-  }
-  
-  body { 
-    background: #f4f4f4; 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: var(--text);
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizer — Prime Skin Hub</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark: #0A0A0A;
+            --card-bg: #141414;
+            --text-main: #FAFAFA;
+            --text-dim: #A1A1AA;
+            --border: rgba(212, 175, 55, 0.2);
+        }
 
-  .psh-wrap { max-width: 500px; margin: 0 auto; padding: 20px; }
+        body {
+            background-color: var(--dark);
+            color: var(--text-main);
+            font-family: 'Syne', 'DM Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-  /* Header Mockup */
-  .psh-header {
-    background: var(--dark);
-    color: white;
-    padding: 20px;
-    border-radius: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  }
+        .psh-wrap { width: 100%; max-width: 450px; }
 
-  /* Progress Steps */
-  .psh-steps { display: flex; justify-content: space-between; margin-bottom: 20px; }
-  .step-dot { 
-    width: 30px; height: 30px; border-radius: 50%; background: #ddd; 
-    display: flex; align-items: center; justify-content: center; font-size: 12px;
-  }
-  .step-dot.active { background: var(--gold); color: white; }
+        /* HEADER */
+        .psh-header {
+            background: linear-gradient(145deg, #1a1a1a, #000);
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
 
-  /* Brand & Model Cards */
-  .brand-grid, .model-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-  }
-  
-  .brand-card, .model-card {
-    background: var(--card-bg);
-    border: 1px solid #eee;
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    transition: 0.3s;
-    cursor: pointer;
-  }
+        .psh-title { font-size: 20px; font-weight: 700; color: var(--gold); margin: 0; letter-spacing: 1px; }
+        .psh-sub { font-size: 12px; color: var(--text-dim); margin-top: 5px; }
 
-  .brand-card.selected, .model-card.selected {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 2px var(--gold);
-  }
+        /* SECTION LABELS */
+        .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 20px 0 10px 5px; opacity: 0.8; }
 
-  /* THE DEVICE PREVIEW MOCKUP */
-  .preview-card {
-    background: white;
-    border-radius: 30px;
-    padding: 30px;
-    text-align: center;
-    margin-top: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-  }
+        /* GRIDS */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-  .preview-phone {
-    width: 140px;
-    height: 280px;
-    background: #222;
-    border-radius: 25px;
-    margin: 0 auto 20px;
-    border: 6px solid #333;
-    position: relative;
-    overflow: hidden;
-  }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-  .preview-phone-skin {
-    position: absolute;
-    inset: 0;
-    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+        .card:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .card.selected { border-color: var(--gold); background: var(--gold); color: var(--dark); font-weight: bold; }
 
-  /* Button Mockup */
-  .psh-btn {
-    background: var(--dark);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 12px;
-    font-weight: 600;
-    width: 100%;
-    margin-top: 20px;
-    cursor: pointer;
-  }
-</style>
+        /* THE LAYERED VISUALIZER */
+        .preview-container {
+            background: #000;
+            border-radius: 32px;
+            padding: 40px 20px;
+            margin-top: 30px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-mockup {
+            width: 160px;
+            height: 320px;
+            margin: 0 auto;
+            position: relative;
+            background: #111;
+            border-radius: 30px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
+        }
+
+        /* LAYER 1: The Skin (Bottom) */
+        .layer-skin {
+            position: absolute;
+            inset: 8px; /* Slightly inside the frame */
+            border-radius: 22px;
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* LAYER 2: The Device Frame (Top/Transparent PNG) */
+        .layer-frame {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none; /* Allows clicking through to skin if needed */
+        }
+
+        .price-tag { font-size: 28px; color: var(--gold); font-weight: 700; margin: 20px 0 10px; }
+        
+        .buy-btn {
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
 
 <div class="psh-wrap">
-  <div class="psh-header">
-    <h2 style="margin:0; font-size: 18px;">Prime Skin Hub</h2>
-    <p style="font-size:12px; opacity: 0.7;">Premium Device Visualizer</p>
-  </div>
-
-  <div class="psh-section-label">01. Select Brand</div>
-  <div class="brand-grid" id="brandGrid"></div>
-
-  <div id="modelSection" style="display:none; margin-top:30px;">
-    <div class="psh-section-label">02. Select Model</div>
-    <div class="model-grid" id="modelGrid"></div>
-  </div>
-
-  <div id="previewSection" style="display:none;">
-    <div class="preview-card">
-      <div class="preview-phone">
-        <div class="preview-phone-skin" id="previewSkin"></div>
-      </div>
-      <h3 id="prevModelName" style="margin:10px 0 5px;">Model</h3>
-      <p id="prevPrice" style="color: var(--gold); font-weight: bold; font-size: 20px;">₹0</p>
-      <button class="psh-btn">Get This Skin</button>
+    <div class="psh-header">
+        <h1 class="psh-title">PRIME SKIN HUB</h1>
+        <p class="psh-sub">PREMIUM DEVICE VISUALIZER</p>
     </div>
-  </div>
+
+    <div class="section-label">01. Select Brand</div>
+    <div class="grid" id="brandGrid"></div>
+
+    <div id="modelSection" style="display:none;">
+        <div class="section-label">02. Select Model</div>
+        <div class="grid" id="modelGrid"></div>
+    </div>
+
+    <div id="previewSection" style="display:none;">
+        <div class="preview-container">
+            <div class="phone-mockup">
+                <div id="skinLayer" class="layer-skin"></div>
+                <div id="frameLayer" class="layer-frame"></div>
+            </div>
+            
+            <h2 id="displayModel" style="margin-top:20px; font-size:18px;">Device Name</h2>
+            <div class="price-tag" id="displayPrice">₹0</div>
+            <button class="buy-btn" onclick="alert('Order Placed!')">Add to Cart</button>
+        </div>
+    </div>
 </div>
 
 <script>
-// I kept your existing logic so the functionality doesn't break!
-const DATA = {
-  brands: [
-    { id: "apple", name: "Apple", models: [{id: "ip17", name: "iPhone 17 Pro", price: "999"}] },
-    { id: "samsung", name: "Samsung", models: [{id: "s26", name: "S26 Ultra", price: "1099"}] }
-  ]
-};
+    const DATA = {
+        brands: [
+            { 
+                id: "apple", 
+                name: "Apple", 
+                models: [
+                    { id: "ip15", name: "iPhone 15 Pro", price: "999", frame: "https://www.apple.com/v/iphone-15-pro/c/images/overview/welcome/hero_endframe__cvklg0xk9w6e_large.jpg" },
+                    { id: "ip16", name: "iPhone 16 Pro", price: "1099", frame: "YOUR_IP16_FRAME_URL" }
+                ] 
+            },
+            { 
+                id: "samsung", 
+                name: "Samsung", 
+                models: [
+                    { id: "s24", name: "S24 Ultra", price: "1299", frame: "YOUR_S24_FRAME_URL" }
+                ] 
+            }
+        ],
+        skins: [
+            { id: "carbon", name: "Carbon Fiber", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500" },
+            { id: "gold", name: "Liquid Gold", img: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?w=500" }
+        ]
+    };
 
-function renderBrands() {
-  document.getElementById('brandGrid').innerHTML = DATA.brands.map(b => `
-    <div class="brand-card" onclick="selectBrand('${b.id}')">
-      <strong>${b.name}</strong>
-    </div>
-  `).join('');
-}
+    function init() {
+        const grid = document.getElementById('brandGrid');
+        grid.innerHTML = DATA.brands.map(b => `
+            <div class="card" onclick="selectBrand('${b.id}')">${b.name}</div>
+        `).join('');
+    }
 
-function selectBrand(id) {
-  const brand = DATA.brands.find(b => b.id === id);
-  document.getElementById('modelSection').style.display = 'block';
-  document.getElementById('modelGrid').innerHTML = brand.models.map(m => `
-    <div class="model-card" onclick="selectModel('${m.name}', '${m.price}')">
-      ${m.name}
-    </div>
-  `).join('');
-}
+    function selectBrand(brandId) {
+        const brand = DATA.brands.find(b => b.id === brandId);
+        const modelSection = document.getElementById('modelSection');
+        const modelGrid = document.getElementById('modelGrid');
+        
+        modelSection.style.display = 'block';
+        modelGrid.innerHTML = brand.models.map(m => `
+            <div class="card" onclick="selectModel('${brandId}', '${m.id}')">${m.name}</div>
+        `).join('');
+    }
 
-function selectModel(name, price) {
-  document.getElementById('previewSection').style.display = 'block';
-  document.getElementById('prevModelName').innerText = name;
-  document.getElementById('prevPrice').innerText = '₹' + price;
-  document.getElementById('previewSkin').style.background = '#C9A96E'; // Default Gold Mockup
-}
+    function selectModel(brandId, modelId) {
+        const brand = DATA.brands.find(b => b.id === brandId);
+        const model = brand.models.find(m => m.id === modelId);
+        
+        document.getElementById('previewSection').style.display = 'block';
+        document.getElementById('displayModel').innerText = model.name;
+        document.getElementById('displayPrice').innerText = '₹' + model.price;
+        
+        // Update Frame (Top Layer)
+        document.getElementById('frameLayer').style.backgroundImage = `url('${model.frame}')`;
+        
+        // Set a default skin for now
+        document.getElementById('skinLayer').style.backgroundImage = `url('${DATA.skins[0].img}')`;
+    }
 
-renderBrands();
+    init();
 </script>
+
+</body>
+</html>
