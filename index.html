@@ -360,7 +360,14 @@
   .stat-label { font-family:'Syne',sans-serif; font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-top:.25rem; }
 
   /* ── MARQUEE ── */
-  .marquee-wrapper { overflow: hidden; background: var(--gold); padding: .75rem 0; }
+  .marquee-wrapper { 
+  overflow: hidden; 
+  background: var(--gold); 
+  padding: .75rem 0; 
+  margin-top: 72px; /* This pushes it below the navbar */
+  position: relative;
+  z-index: 10;
+}
   .marquee-track {
     display: flex; gap: 3rem;
     animation: marquee 22s linear infinite;
