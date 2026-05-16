@@ -35,11 +35,35 @@
     background: var(--card); border: 1px solid var(--border);
     padding: 16px; border-radius: 12px; color: #fff; cursor: pointer; 
     text-align: center; font-size: 14px; transition: 0.2s;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
   .btn:hover { border-color: var(--gold); background: rgba(196, 164, 132, 0.05); }
   .btn.active { border-color: var(--gold); background: var(--gold); color: #000; font-weight: bold; }
 
-  @media (max-width: 900px) { .app-container { grid-template-columns: 1fr; } .preview-pane { position: relative; height: auto; } }
+  @media (max-width: 600px) {
+    .app-container {
+      grid-template-columns: 1fr; 
+      padding: 15px;
+      gap: 10px;
+    }
+    .preview-pane {
+      position: relative; 
+      top: 0;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    .visualizer-display {
+      width: 100%;
+      max-width: 300px; 
+      height: 400px;
+    }
+    .grid {
+      grid-template-columns: 1fr 1fr; 
+    }
+    h1 { font-size: 22px; }
+  }
 </style>
 
 <div class="app-container">
